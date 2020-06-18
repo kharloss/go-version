@@ -8,7 +8,7 @@ some key facts about the programs compile.
 Example:
 
 ```
-cloudkey version v1.0.0-rc2 git revision fe3428954dfd97d850ca687badcace28102e351d go version go1.11
+cloudkey version v1.0.0-rc2 git revision fe3428954dfd97d850ca687badcace28102e351d go version go1.12
 ```
 
 I was tiring of writing this over, and over, and over again, so I just made a
@@ -27,14 +27,37 @@ import (
 Then, when you build, add these variables to the command line:
 
 ```
-VERSION=$(shell git describe --tags)
-REVISION=$(shell git rev-parse HEAD)
-RELEASE=$(shell git describe --tags | cut -d"-" -f 1,2)
-BUILD_DATE=$(shell date -u +"%Y-%m-%dT%H:%M:%S+00:00")
 APPLICATION=$(shell basename `pwd`)
-GO_LDFLAGS="-X github.com/jnovack/go-version/build.Application=${application} -X github.com/jnovack/go-version/build.Version=${version} -X github.com/jnovack/go-version/build.Revision=${revision} -X github.com/jnovack/go-version/build.BuildDate=${build_date}"
+BUILD_RFC3339=$(shell date -u +"%Y-%m-%dT%H:%M:%S+00:00")
+COMMIT=$(shell git rev-parse HEAD)
+VERSION=$(shell git describe --tags)
+GO_LDFLAGS="-w -s \
+    -X github.com/jnovack/go-version.Application=${APPLICATION} \
+    -X github.com/jnovack/go-version.BuildDate=${BUILD_RFC3339} \
+	-X github.com/jnovack/go-version.Revision=${COMMIT} \
+	-X github.com/jnovack/go-version.Version=${VERSION}
+	"
 
-go build -ldflags GO_LDFLAGS main.go
+go build -ldflags "GO_LDFLAGS" main.go
 ```
 
-or use the Makefile and do not be a scrub.
+or use a `Makefile` and do not be a scrub.
+
+## Variables
+
+All the variables are exported, so you can reference them within your code.
+
+```
+var (
+	// Application supplied by the linker
+	Application = "go-application"
+	// BuildRFC3339 supplied by the linker
+	BuildRFC3339 = "1970-01-01T00:00:00+00:00"
+	// Version supplied by the linker
+	Version = "v0.0.0"
+	// Commit supplied by the linker
+	Commit = "00000000"
+	// GoVersion supplied by the runtime
+	GoVersion = runtime.Version()
+)
+```

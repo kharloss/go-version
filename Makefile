@@ -1,10 +1,9 @@
-version := $(shell git describe --tags)
-revision := $(shell git rev-parse HEAD)
-release := $(shell git describe --tags | cut -d"-" -f 1,2)
-build_date := $(shell date -u +"%Y-%m-%dT%H:%M:%S+00:00")
-application := $(shell basename `pwd`)
+APPLICATION := $(shell basename `pwd`)
+BUILD_RFC3339 := $(shell date -u +"%Y-%m-%dT%H:%M:%S+00:00")
+COMMIT := $(shell git rev-parse HEAD)
+VERSION := $(shell git describe --tags)
 
-GO_LDFLAGS := "-X github.com/jnovack/go-version/build.Application=${application} -X github.com/jnovack/go-version/build.Version=${version} -X github.com/jnovack/go-version/build.Revision=${revision}"
+GO_LDFLAGS := "-s -w -X github.com/jnovack/go-version.Application=${APPLICATION} -X github.com/jnovack/go-version.BuildDate=${BUILD_RFC3339} -X github.com/jnovack/go-version.Revision=${COMMIT} -X github.com/jnovack/go-version.Version=${VERSION}"
 
 all: build
 
