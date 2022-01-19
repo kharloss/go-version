@@ -1,3 +1,3 @@
-module github.com/jnovack/go-version
+module github.com/kharloss/go-version
 
-go 1.12
+go 1.6.2
